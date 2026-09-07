@@ -65,6 +65,7 @@ class GoogleDriveBackupService {
   static const List<String> _scopes = ['https://www.googleapis.com/auth/drive.file'];
 
   static GoogleSignIn get _signIn => GoogleSignIn.instance;
+  static GoogleSignInAccount? _currentUser;
   static bool _initialized = false;
 
   static Future<void> _ensureInitialized() async {
@@ -80,13 +81,14 @@ class GoogleDriveBackupService {
   static Future<String> signIn() async {
     await _ensureInitialized();
     final GoogleSignInAccount account = await _signIn.authenticate();
+    _currentUser = account;
     await account.authorizationClient.authorizeScopes(_scopes);
     return account.email;
   }
 
   static Future<bool> isSignedIn() async {
     await _ensureInitialized();
-    return _signIn.currentUser != null;
+    return _currentUser != null;
   }
 
   static Future<void> signOut() async {
@@ -103,7 +105,7 @@ class GoogleDriveBackupService {
   /// generic "backup failed."
   static Future<String> uploadFile(File file, {String? driveFileName}) async {
     await _ensureInitialized();
-    final account = _signIn.currentUser;
+    final account = _currentUser;
     if (account == null) {
       throw StateError('Not signed in to Google. Call signIn() first.');
     }
