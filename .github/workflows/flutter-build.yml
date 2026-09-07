@@ -1,0 +1,92 @@
+name: Flutter Build
+
+# Minimal, linear build pipeline for the Setumitra mobile app, aligned
+# exactly to a 7-step spec: checkout -> set up Flutter -> pub get ->
+# analyze -> build release APK -> verify the APK file actually exists ->
+# upload it as an artifact. No debug build, no GitHub Release publishing,
+# no dart-define flags tied to the abandoned Path A (FastAPI backend)
+# architecture -- those existed in an earlier version of this workflow
+# but are unrelated to whether the app itself compiles, and were removed
+# to keep the first real build attempt as simple and unambiguous as
+# possible to debug if it fails.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mobile/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'mobile/**'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Flutter 3.47.0
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # 3.47.0, not 3.24.0. theme_service.dart uses
+          # `cardTheme: CardThemeData(...)` -- CardThemeData only became
+          # the correct type for ThemeData.cardTheme starting in Flutter
+          # 3.32 stable (landed 3.31.0-0.0.pre; Flutter's own "Component
+          # theme normalization" breaking-change doc). Confirmed against
+          # a real-world report of the exact same type-mismatch error in
+          # another project after crossing that same boundary
+          # (iampawan/VelocityX#220).
+          flutter-version: '3.47.0'
+          channel: 'stable'
+
+      # 3. flutter pub get
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4. flutter analyze -- no continue-on-error. A real analyzer error
+      # must stop this workflow here, not be swallowed while later steps
+      # run anyway.
+      - name: Analyze
+        run: flutter analyze
+
+      # 5. flutter build apk --release -- no continue-on-error. A real
+      # build failure must stop the workflow here.
+      - name: Build release APK
+        run: flutter build apk --release
+
+      # 6. Verify the APK file actually exists. flutter build apk exiting
+      # 0 already implies success in the normal case, so in practice this
+      # step is a safety net, not the primary failure signal -- but it is
+      # an explicit, unambiguous check rather than an assumption, and it
+      # protects against the edge case where the build tool reports
+      # success without producing the expected file. `working-directory:
+      # mobile` is in effect here, so the path is relative to mobile/, not
+      # the repo root.
+      - name: Verify APK was actually produced
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::Expected APK not found at mobile/$APK_PATH -- flutter build apk reported success but produced no file."
+            exit 1
+          fi
+          echo "Verified: $APK_PATH exists ($(du -h "$APK_PATH" | cut -f1))."
+
+      # 7. Upload the generated APK as a GitHub Actions artifact.
+      # Path is relative to the repo root (upload-artifact does not
+      # inherit the job's working-directory default the way `run:` steps
+      # do), matching the actual output location under mobile/.
+      - name: Upload release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: setumitra-release-apk
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+          if-no-files-found: error

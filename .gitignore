@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+venv/
+*.db
+generated/
+uploads/
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies

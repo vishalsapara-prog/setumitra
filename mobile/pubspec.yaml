@@ -1,0 +1,40 @@
+name: setumitra
+description: "Setumitra — Shramsetu Portal Registration & OCR Auto-Fill Mobile Client"
+publish_to: 'none'
+version: 2.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.7.0
+  file_picker: ^8.0.3
+  flutter_secure_storage: ^9.2.1
+  provider: ^6.1.2
+  camera: ^0.11.0+2
+  image: ^4.2.0
+  image_cropper: ^8.0.2
+  shared_preferences: ^2.3.2
+  path_provider: ^2.1.4
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  google_mlkit_text_recognition: ^0.15.1
+  archive: ^4.0.9
+  share_plus: ^13.1.0
+  cross_file: ^0.3.4+2
+  excel: ^4.0.0
+  google_sign_in: ^7.1.1
+  extension_google_sign_in_as_googleapis_auth: ^3.0.0
+  googleapis: ^13.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/word_templates/

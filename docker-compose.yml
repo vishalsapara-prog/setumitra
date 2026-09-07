@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  shramsetu-api:
+    build: ./backend
+    container_name: shramsetu_api_server
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./shramsetu.db
+    volumes:
+      - ./backend:/app
+    restart: always
+
+  shramsetu-ui:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shramsetu_web_dashboard
+    command: streamlit run ../ui_web/app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    depends_on:
+      - shramsetu-api
+    volumes:
+      - ./ui_web:/ui_web
+    restart: always
