@@ -63,7 +63,7 @@ class _CameraSettingsScreenState extends State<CameraSettingsScreen> {
           _sectionHeader('Camera Resolution'),
           _card(
             child: DropdownButtonFormField<int>(
-              value: _settings.resolutionMegapixels,
+              initialValue: _settings.resolutionMegapixels,
               decoration: const InputDecoration(
                 labelText: 'Document image quality નિયંત્રિત કરવી',
                 border: OutlineInputBorder(),
@@ -109,7 +109,7 @@ class _CameraSettingsScreenState extends State<CameraSettingsScreen> {
           _sectionHeader('Filter'),
           _card(
             child: DropdownButtonFormField<CameraFilterMode>(
-              value: _settings.filter,
+              initialValue: _settings.filter,
               decoration: const InputDecoration(
                 labelText: 'Document readability સુધારવી',
                 border: OutlineInputBorder(),
@@ -217,7 +217,7 @@ class _CameraSettingsScreenState extends State<CameraSettingsScreen> {
       title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 11.5, color: Colors.black54)),
       value: value,
-      activeColor: const Color(0xFF2B6CB0),
+      activeThumbColor: const Color(0xFF2B6CB0),
       onChanged: onChanged,
     );
   }

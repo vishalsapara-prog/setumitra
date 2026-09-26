@@ -26,18 +26,20 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, _) {
-              return Card(
-                child: Column(
-                  children: SetumitraTheme.values.map((t) {
-                    return RadioListTile<SetumitraTheme>(
-                      title: Text(t.label),
-                      value: t,
-                      groupValue: themeProvider.current,
-                      onChanged: (v) {
-                        if (v != null) themeProvider.setTheme(v);
-                      },
-                    );
-                  }).toList(),
+              return RadioGroup<SetumitraTheme>(
+                groupValue: themeProvider.current,
+                onChanged: (v) {
+                  if (v != null) themeProvider.setTheme(v);
+                },
+                child: Card(
+                  child: Column(
+                    children: SetumitraTheme.values.map((t) {
+                      return RadioListTile<SetumitraTheme>(
+                        title: Text(t.label),
+                        value: t,
+                      );
+                    }).toList(),
+                  ),
                 ),
               );
             },

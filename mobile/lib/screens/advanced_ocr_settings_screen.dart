@@ -76,7 +76,7 @@ class _AdvancedOcrSettingsScreenState extends State<AdvancedOcrSettingsScreen> {
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: DropdownButtonFormField<TextRecognitionScript>(
-                value: _settings.ocrScript,
+                initialValue: _settings.ocrScript,
                 decoration: const InputDecoration(
                   labelText: 'Supported script',
                   border: OutlineInputBorder(),

@@ -29,9 +29,28 @@ jobs:
         working-directory: ./mobile
         run: flutter pub get
 
+      - name: Analyze
+        working-directory: ./mobile
+        # --no-fatal-infos: advisory "info" level lints (e.g. an SDK
+        # deprecation notice on a newer stable Flutter channel release)
+        # must not fail the build on their own -- only real analyzer
+        # warnings/errors should. This is what previously made this step
+        # fail on 10 purely informational issues with no actual errors.
+        run: flutter analyze --no-fatal-infos
+
       - name: Build release APK
         working-directory: ./mobile
         run: flutter build apk --release
+
+      - name: Verify APK was actually produced
+        working-directory: ./mobile
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::Release APK was not produced at $APK_PATH"
+            exit 1
+          fi
+          echo "Verified: $APK_PATH exists ($(du -h "$APK_PATH" | cut -f1))"
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
