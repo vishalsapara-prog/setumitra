@@ -14,21 +14,208 @@ Alternatively, use the flag "--android-skip-build-dependency-validation" to bypa
 Potential fix: Your project's AGP version is typically defined in the plugins block of the `settings.gradle` file (/home/runner/work/setumitra/setumitra/mobile/android/settings.gradle), by a plugin with the id of com.android.application. 
 If you don't see a plugins block, your project was likely created with an older template version. In this case it is most likely defined in the top-level build.gradle file (/home/runner/work/setumitra/setumitra/mobile/android/build.gradle) by the following line in the dependencies block of the buildscript: "classpath 'com.android.tools.build:gradle:<version>'".
 
+Warning: Flutter support for your project's Kotlin version (2.2.20) will soon be dropped. Please upgrade your Kotlin version to a version of at least 2.3.20 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's KGP version is typically defined in the plugins block of the `settings.gradle` file (/home/runner/work/setumitra/setumitra/mobile/android/settings.gradle), by a plugin with the id of org.jetbrains.kotlin.android. 
+If you don't see a plugins block, your project was likely created with an older template version, in which case it is most likely defined in the top-level build.gradle file (/home/runner/work/setumitra/setumitra/mobile/android/build.gradle) by the ext.kotlin_version property.
+
+Warning: The plugin camera_android_camerax requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin flutter_plugin_android_lifecycle requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin google_mlkit_commons requires Android SDK version 35 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin google_mlkit_text_recognition requires Android SDK version 35 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin google_sign_in_android requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin image_cropper requires Android SDK version 35 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin jni requires Android SDK version 35 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin jni_flutter requires Android SDK version 35 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin share_plus requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin shared_preferences_android requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin sqflite_android requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Warning: The plugin webview_flutter_android requires Android SDK version 36 or higher.
+For more information about build configuration, see https://flutter.dev/to/review-gradle-config.
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 6124 bytes (99.6% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Your project is configured to compile against Android SDK 34, but the following plugin(s) require to be compiled against a higher Android SDK version:
+- camera_android_camerax compiles against Android SDK 36
+- flutter_plugin_android_lifecycle compiles against Android SDK 36
+- google_mlkit_commons compiles against Android SDK 35
+- google_mlkit_text_recognition compiles against Android SDK 35
+- google_sign_in_android compiles against Android SDK 36
+- image_cropper compiles against Android SDK 35
+- jni compiles against Android SDK 35
+- jni_flutter compiles against Android SDK 35
+- share_plus compiles against Android SDK 36
+- shared_preferences_android compiles against Android SDK 36
+- sqflite_android compiles against Android SDK 36
+- webview_flutter_android compiles against Android SDK 36
+Fix this issue by compiling against the highest Android SDK version (they are backward compatible).
+Add the following to /home/runner/work/setumitra/setumitra/mobile/android/app/build.gradle:
+
+    android {
+        compileSdk = 36
+        ...
+    }
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+Note: /home/runner/.pub-cache/hosted/pub.dev/google_mlkit_commons-0.11.1/android/src/main/java/com/google_mlkit_commons/InputImageConverter.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
 
 FAILURE: Build failed with an exception.
 
-* Where:
-Build file '/home/runner/work/setumitra/setumitra/mobile/android/app/build.gradle' line: 4
-
 * What went wrong:
-An exception occurred applying plugin request [id: 'dev.flutter.flutter-gradle-plugin']
-> Failed to apply plugin 'dev.flutter.flutter-gradle-plugin'.
-   > Error: Your project's Kotlin version (2.0.0) is lower than Flutter's minimum supported version of 2.2.20. Please upgrade your Kotlin version. 
-     Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+Execution failed for task ':app:checkReleaseAarMetadata'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.CheckAarMetadataWorkAction
+   > 9 issues were found when checking AAR metadata:
 
-     Potential fix: Your project's KGP version is typically defined in the plugins block of the `settings.gradle` file (/home/runner/work/setumitra/setumitra/mobile/android/settings.gradle), by a plugin with the id of org.jetbrains.kotlin.android. 
-     If you don't see a plugins block, your project was likely created with an older template version, in which case it is most likely defined in the top-level build.gradle file (/home/runner/work/setumitra/setumitra/mobile/android/build.gradle) by the ext.kotlin_version property.
+       1.  Dependency 'androidx.camera:camera-video:1.5.3' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
 
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       2.  Dependency 'androidx.camera:camera-lifecycle:1.5.3' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       3.  Dependency 'androidx.camera:camera-camera2:1.5.3' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       4.  Dependency 'androidx.camera:camera-core:1.5.3' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       5.  Dependency 'androidx.credentials:credentials-play-services-auth:1.6.0' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       6.  Dependency 'androidx.credentials:credentials:1.6.0' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       7.  Dependency 'androidx.core:core:1.16.0' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       8.  Dependency 'androidx.core:core-ktx:1.16.0' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
+
+       9.  Dependency 'androidx.camera.featurecombinationquery:featurecombinationquery:1.5.3' requires libraries and applications that
+           depend on it to compile against version 35 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-34.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 35, for example 36.
+
+           Note that updating a library or application's compileSdk (which
+           allows newer APIs to be used) can be done separately from updating
+           targetSdk (which opts the app in to new runtime behavior) and
+           minSdk (which determines which devices the app can be installed
+           on).
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -36,19 +223,6 @@ An exception occurred applying plugin request [id: 'dev.flutter.flutter-gradle-p
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 1m 38s
-Running Gradle task 'assembleRelease'...                          100.2s
-
-┌─ Flutter Fix ────────────────────────────────────────────────────────────────────────┐
-│ [!] Starting AGP 9+, only the new DSL interface will be read.                        │
-│ This results in a build failure when applying the Flutter Gradle plugin at           │
-│ /home/runner/work/setumitra/setumitra/mobile/android/app/build.gradle.               │
-│                                                                                      │
-│ To resolve this update flutter or opt out of `android.newDsl`.                       │
-│ For instructions on how to opt out, see:                                             │
-│ https://developer.android.com/build/releases/agp-9-0-0-release-notes                 │
-│                                                                                      │
-│ If you are not upgrading to AGP 9+, run `flutter analyze --suggestions` to check for │
-│ incompatible dependencies.                                                           │
-└──────────────────────────────────────────────────────────────────────────────────────┘
+BUILD FAILED in 3m 54s
+Running Gradle task 'assembleRelease'...                          235.3s
 Gradle task assembleRelease failed with exit code 1
