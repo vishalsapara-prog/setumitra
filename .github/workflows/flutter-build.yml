@@ -3,11 +3,14 @@ name: Flutter Build
 on:
   push:
     branches: [ "main" ]
+    paths-ignore: [ "ci-logs/**" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -40,7 +43,56 @@ jobs:
 
       - name: Build release APK
         working-directory: ./mobile
-        run: flutter build apk --release
+        run: flutter build apk --release 2>&1 | tee /tmp/build-apk.log
+
+      - name: Capture build log on failure (for offline diagnosis)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PYEOF'
+          import base64, json, os, subprocess
+
+          log_path = "/tmp/build-apk.log"
+          try:
+              with open(log_path, "rb") as f:
+                  data = f.read()
+          except FileNotFoundError:
+              data = b"(no log captured -- build step produced no /tmp/build-apk.log)"
+
+          tail = data[-60000:]
+          b64 = base64.b64encode(tail).decode()
+          repo = os.environ["GH_REPO"]
+          token = os.environ["GH_TOKEN"]
+          run_id = os.environ["RUN_ID"]
+          api = f"https://api.github.com/repos/{repo}/contents/ci-logs/last-build-failure.txt"
+          headers = ["-H", f"Authorization: Bearer {token}", "-H", "Accept: application/vnd.github+json"]
+
+          get = subprocess.run(["curl", "-s", *headers, api], capture_output=True, text=True)
+          sha = None
+          try:
+              j = json.loads(get.stdout)
+              sha = j.get("sha")
+          except Exception:
+              pass
+
+          payload = {
+              "message": f"ci: capture build failure log (run {run_id}) [skip ci]",
+              "content": b64,
+              "branch": "main",
+          }
+          if sha:
+              payload["sha"] = sha
+
+          put = subprocess.run(
+              ["curl", "-s", "-w", "\\nHTTP:%{http_code}\\n", "-X", "PUT", *headers, api, "-d", json.dumps(payload)],
+              capture_output=True, text=True,
+          )
+          print(put.stdout[-1500:])
+          print(put.stderr[-1500:])
+          PYEOF
 
       - name: Verify APK was actually produced
         working-directory: ./mobile
