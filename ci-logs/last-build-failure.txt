@@ -1,0 +1,26 @@
+Upgrading build.gradle
+Upgrading gradle.properties
+Upgrading gradle.properties
+Running Gradle task 'assembleRelease'...                        
+e: file:///opt/hostedtoolcache/flutter/stable-3.47.5-x64/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:753:21 Unresolved reference: filePermissions
+e: file:///opt/hostedtoolcache/flutter/stable-3.47.5-x64/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:754:25 Unresolved reference: user
+e: file:///opt/hostedtoolcache/flutter/stable-3.47.5-x64/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:755:29 Unresolved reference: read
+e: file:///opt/hostedtoolcache/flutter/stable-3.47.5-x64/flutter/packages/flutter_tools/gradle/src/main/kotlin/FlutterPlugin.kt:756:29 Unresolved reference: write
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':gradle:compileKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 1m 3s
+Running Gradle task 'assembleRelease'...                           63.9s
+Gradle task assembleRelease failed with exit code 1
