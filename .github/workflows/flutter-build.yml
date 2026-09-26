@@ -43,7 +43,13 @@ jobs:
 
       - name: Build release APK
         working-directory: ./mobile
-        run: flutter build apk --release 2>&1 | tee /tmp/build-apk.log
+        # explicit pipefail: without it, `tee`'s own exit code (always 0)
+        # is what this step reports, silently masking a real failure in
+        # `flutter build` -- exactly what happened on the previous run,
+        # where this step showed "success" with no APK ever produced.
+        run: |
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee /tmp/build-apk.log
 
       - name: Capture build log on failure (for offline diagnosis)
         if: failure()
