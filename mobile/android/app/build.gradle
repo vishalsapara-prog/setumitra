@@ -15,6 +15,49 @@ if (localPropertiesFile.exists()) {
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
 def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
+// Production release signing.
+//
+// `android/key.properties` is NEVER committed to this repository (see
+// android/.gitignore) -- it only exists transiently:
+//   - on a developer's own machine, hand-created from the keystore they hold, or
+//   - on a GitHub Actions runner, generated at build time by the "Decode
+//     signing key" workflow step from 4 repository secrets
+//     (ANDROID_KEYSTORE_BASE64 / ANDROID_KEY_ALIAS /
+//     ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_PASSWORD).
+//
+// When key.properties is absent (e.g. a contributor's local debug build with
+// no signing secrets available), the release buildType safely falls back to
+// the Android SDK's auto-generated debug signing config below, exactly as
+// this project already did before production signing was wired in -- so a
+// plain `flutter build apk --release` never hard-fails on a machine that
+// simply hasn't been given the production key.
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+def hasReleaseSigningConfig = keystorePropertiesFile.exists()
+if (hasReleaseSigningConfig) {
+    keystorePropertiesFile.withReader("UTF-8") { reader ->
+        keystoreProperties.load(reader)
+    }
+    def requiredKeys = ["storeFile", "storePassword", "keyAlias", "keyPassword"]
+    def missingKeys = requiredKeys.findAll { !keystoreProperties.getProperty(it) }
+    if (!missingKeys.isEmpty()) {
+        throw new GradleException(
+            "android/key.properties is present but missing required key(s): " +
+            missingKeys.join(", ") + ". Either supply all of " +
+            requiredKeys.join(", ") + ", or delete key.properties entirely " +
+            "to fall back to debug signing."
+        )
+    }
+    def resolvedStoreFile = rootProject.file("app/${keystoreProperties['storeFile']}")
+    if (!resolvedStoreFile.exists()) {
+        throw new GradleException(
+            "android/key.properties references storeFile '" +
+            keystoreProperties['storeFile'] + "' but no such file exists at " +
+            resolvedStoreFile.absolutePath + "."
+        )
+    }
+}
+
 android {
     namespace "com.example.setumitra"
     compileSdk 36
@@ -41,9 +84,21 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigningConfig) {
+            release {
+                storeFile file("${keystoreProperties['storeFile']}")
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeType keystoreProperties.getProperty("storeType", "PKCS12")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseSigningConfig ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

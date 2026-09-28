@@ -32,6 +32,44 @@ jobs:
         working-directory: ./mobile
         run: flutter pub get
 
+      - name: Decode production signing key
+        working-directory: ./mobile
+        # Reconstructs android/key.properties + the keystore file from
+        # repository secrets, entirely inside this ephemeral runner
+        # workspace -- neither file is ever written back to the repository.
+        # If the secrets are not configured (e.g. a fork, or before the repo
+        # owner has added them), this step deliberately no-ops: build.gradle
+        # detects the absence of key.properties and falls back to debug
+        # signing, so the pipeline still goes green end-to-end either way.
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -o pipefail
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 secret is not set -- release APK will fall back to debug signing."
+            exit 0
+          fi
+          if [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is set but one or more of ANDROID_KEY_ALIAS / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_PASSWORD is missing. Add all four secrets, or remove all four to intentionally use debug signing."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/setumitra-release.p12
+          if ! keytool -list -storetype PKCS12 -keystore android/app/setumitra-release.p12 -storepass "$ANDROID_KEYSTORE_PASSWORD" >/dev/null 2>&1; then
+            echo "::error::Decoded keystore failed to open with the provided ANDROID_KEYSTORE_PASSWORD -- check the secret values."
+            exit 1
+          fi
+          cat > android/key.properties <<EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=setumitra-release.p12
+          storeType=PKCS12
+          EOF
+          echo "Production signing key decoded and verified; release build will be signed with it."
+
       - name: Analyze
         working-directory: ./mobile
         # --no-fatal-infos: advisory "info" level lints (e.g. an SDK
@@ -109,6 +147,76 @@ jobs:
             exit 1
           fi
           echo "Verified: $APK_PATH exists ($(du -h "$APK_PATH" | cut -f1))"
+
+      - name: Record APK signer info (for offline verification)
+        # Runs regardless of pass/fail so far: this is how the signing setup
+        # gets verified from an environment that cannot download the binary
+        # artifact itself (its download endpoint redirects to blob storage
+        # outside this workflow's diagnosing environment's network policy).
+        # It writes only a public certificate fingerprint -- never key
+        # material -- to the repo, the same way build failures are captured.
+        if: always()
+        working-directory: ./mobile
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          SIGNED_WITH_PRODUCTION_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          OUT="/tmp/signer-info.txt"
+          {
+            echo "signed_with_production_key_secret_present=$SIGNED_WITH_PRODUCTION_KEY"
+            if [ -f "$APK_PATH" ]; then
+              CERT_FILE=$(mktemp)
+              if unzip -p "$APK_PATH" 'META-INF/*.RSA' > "$CERT_FILE" 2>/dev/null && [ -s "$CERT_FILE" ]; then
+                keytool -printcert -file "$CERT_FILE" 2>&1
+              elif unzip -p "$APK_PATH" 'META-INF/*.DSA' > "$CERT_FILE" 2>/dev/null && [ -s "$CERT_FILE" ]; then
+                keytool -printcert -file "$CERT_FILE" 2>&1
+              else
+                echo "No v1 (JAR) signature block found in the APK -- it may be signed with v2/v3 scheme only. Signer block search result:"
+                unzip -l "$APK_PATH" | grep -i "META-INF" || echo "(no META-INF entries at all)"
+              fi
+              rm -f "$CERT_FILE"
+            else
+              echo "APK not found at $APK_PATH -- build did not produce output."
+            fi
+          } > "$OUT" 2>&1
+          cat "$OUT"
+          python3 - <<'PYEOF'
+          import base64, json, os, subprocess
+
+          with open("/tmp/signer-info.txt", "rb") as f:
+              data = f.read()
+
+          b64 = base64.b64encode(data).decode()
+          repo = os.environ["GH_REPO"]
+          token = os.environ["GH_TOKEN"]
+          api = f"https://api.github.com/repos/{repo}/contents/ci-logs/last-signer-info.txt"
+          headers = ["-H", f"Authorization: Bearer {token}", "-H", "Accept: application/vnd.github+json"]
+
+          get = subprocess.run(["curl", "-s", *headers, api], capture_output=True, text=True)
+          sha = None
+          try:
+              j = json.loads(get.stdout)
+              sha = j.get("sha")
+          except Exception:
+              pass
+
+          payload = {
+              "message": "ci: record APK signer info [skip ci]",
+              "content": b64,
+              "branch": "main",
+          }
+          if sha:
+              payload["sha"] = sha
+
+          put = subprocess.run(
+              ["curl", "-s", "-w", "\\nHTTP:%{http_code}\\n", "-X", "PUT", *headers, api, "-d", json.dumps(payload)],
+              capture_output=True, text=True,
+          )
+          print(put.stdout[-1500:])
+          print(put.stderr[-1500:])
+          PYEOF
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,14 @@
+# Production signing material -- NEVER commit these to git.
+#
+# key.properties holds plaintext keystore/key passwords, and *.jks/*.p12/
+# *.keystore are the actual private signing key. In this project both are
+# provisioned only:
+#   - locally, by a developer copying their own securely-held keystore in, or
+#   - in CI, by the "Decode signing key" step in
+#     .github/workflows/flutter-build.yml, which reconstructs them at build
+#     time from GitHub Actions repository secrets and never persists them
+#     back into the repository.
+key.properties
+app/*.jks
+app/*.keystore
+app/*.p12
