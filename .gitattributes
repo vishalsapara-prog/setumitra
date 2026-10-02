@@ -1,0 +1,19 @@
+# Keep binary build artifacts byte-for-byte, with no line-ending or
+# text-mode normalization applied by git on any platform/runner.
+*.apk binary
+*.aab binary
+*.jks binary
+*.p12 binary
+*.keystore binary
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.xlsx binary
+*.xls binary
+*.docx binary
+*.doc binary
+*.pdf binary

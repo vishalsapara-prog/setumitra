@@ -255,6 +255,9 @@ jobs:
               exit 0
             fi
             git commit -m "release: update SetuMitra-release-latest.apk (run ${{ github.run_id }}) [skip ci]"
+            echo "--- working tree state right after commit ---"
+            git status --short
+            git diff --stat
             success=0
             for attempt in 1 2 3 4 5; do
               git fetch origin main
@@ -263,8 +266,12 @@ jobs:
                 success=1
                 break
               fi
-              echo "Push attempt $attempt failed (likely a race with another commit) -- retrying..."
+              echo "--- rebase/push failed on attempt $attempt; working tree state: ---"
+              git status --short
+              git diff --stat
+              echo "Push attempt $attempt failed -- retrying..."
               git rebase --abort 2>/dev/null || true
+              git checkout -- . 2>/dev/null || true
               sleep 5
             done
             if [ "$success" != "1" ]; then
