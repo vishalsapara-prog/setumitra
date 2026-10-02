@@ -3,7 +3,7 @@ name: Flutter Build
 on:
   push:
     branches: [ "main" ]
-    paths-ignore: [ "ci-logs/**" ]
+    paths-ignore: [ "ci-logs/**", "releases/**" ]
   workflow_dispatch:
 
 jobs:
@@ -223,3 +223,39 @@ jobs:
         with:
           name: SetuMitra-Release-APK
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Commit release APK into repository (direct-fetch fallback)
+        # actions/upload-artifact's download endpoint redirects through Azure
+        # Blob Storage, which is unreachable from the offline-diagnosis
+        # environment used to drive this pipeline (egress policy blocks that
+        # host). Committing the APK itself as a normal tracked file lets it
+        # be retrieved with a plain `git pull` instead, which already works
+        # fine over this repo's normal GitHub remote. paths-ignore on
+        # "releases/**" (see the `on.push` trigger above) stops this commit
+        # from re-triggering the workflow.
+        if: success()
+        run: |
+          set -o pipefail
+          mkdir -p releases
+          cp mobile/build/app/outputs/flutter-apk/app-release.apk releases/SetuMitra-release-latest.apk
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git add releases/SetuMitra-release-latest.apk
+          if git diff --cached --quiet; then
+            echo "APK content unchanged since last commit -- nothing to do."
+            exit 0
+          fi
+          git commit -m "release: update SetuMitra-release-latest.apk (run ${{ github.run_id }}) [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            if git rebase origin/main && git push origin HEAD:main; then
+              echo "Pushed release APK on attempt $attempt."
+              exit 0
+            fi
+            echo "Push attempt $attempt failed (likely a race with another commit) -- retrying..."
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          echo "::error::Failed to push releases/SetuMitra-release-latest.apk after 5 attempts."
+          exit 1
