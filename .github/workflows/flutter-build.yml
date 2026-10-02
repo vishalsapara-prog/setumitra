@@ -233,29 +233,90 @@ jobs:
         # fine over this repo's normal GitHub remote. paths-ignore on
         # "releases/**" (see the `on.push` trigger above) stops this commit
         # from re-triggering the workflow.
+        #
+        # Deliberately does NOT touch `origin`'s URL/credentials:
+        # actions/checkout@v4 already configures an authenticated
+        # `http.https://github.com/.extraheader` for this exact remote from
+        # `permissions.contents: write`, and layering a second
+        # x-access-token@ URL-embedded credential on top of that conflicts
+        # with it (this is what made the first attempt at this step fail).
+        id: commit_apk
         if: success()
         run: |
           set -o pipefail
-          mkdir -p releases
-          cp mobile/build/app/outputs/flutter-apk/app-release.apk releases/SetuMitra-release-latest.apk
-          git config user.email "actions@github.com"
-          git config user.name "github-actions[bot]"
-          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git add releases/SetuMitra-release-latest.apk
-          if git diff --cached --quiet; then
-            echo "APK content unchanged since last commit -- nothing to do."
-            exit 0
-          fi
-          git commit -m "release: update SetuMitra-release-latest.apk (run ${{ github.run_id }}) [skip ci]"
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            if git rebase origin/main && git push origin HEAD:main; then
-              echo "Pushed release APK on attempt $attempt."
+          {
+            mkdir -p releases
+            cp mobile/build/app/outputs/flutter-apk/app-release.apk releases/SetuMitra-release-latest.apk
+            git config user.email "actions@github.com"
+            git config user.name "github-actions[bot]"
+            git add releases/SetuMitra-release-latest.apk
+            if git diff --cached --quiet; then
+              echo "APK content unchanged since last commit -- nothing to do."
               exit 0
             fi
-            echo "Push attempt $attempt failed (likely a race with another commit) -- retrying..."
-            git rebase --abort 2>/dev/null || true
-            sleep 5
-          done
-          echo "::error::Failed to push releases/SetuMitra-release-latest.apk after 5 attempts."
-          exit 1
+            git commit -m "release: update SetuMitra-release-latest.apk (run ${{ github.run_id }}) [skip ci]"
+            success=0
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              if git rebase origin/main && git push origin HEAD:main; then
+                echo "Pushed release APK on attempt $attempt."
+                success=1
+                break
+              fi
+              echo "Push attempt $attempt failed (likely a race with another commit) -- retrying..."
+              git rebase --abort 2>/dev/null || true
+              sleep 5
+            done
+            if [ "$success" != "1" ]; then
+              echo "::error::Failed to push releases/SetuMitra-release-latest.apk after 5 attempts."
+              exit 1
+            fi
+          } 2>&1 | tee /tmp/commit-apk.log
+
+      - name: Capture APK-commit failure log (for offline diagnosis)
+        if: failure() && steps.commit_apk.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PYEOF'
+          import base64, json, os, subprocess
+
+          try:
+              with open("/tmp/commit-apk.log", "rb") as f:
+                  data = f.read()
+          except FileNotFoundError:
+              data = b"(no log captured -- step produced no /tmp/commit-apk.log)"
+
+          tail = data[-60000:]
+          b64 = base64.b64encode(tail).decode()
+          repo = os.environ["GH_REPO"]
+          token = os.environ["GH_TOKEN"]
+          run_id = os.environ["RUN_ID"]
+          api = f"https://api.github.com/repos/{repo}/contents/ci-logs/last-apk-commit-failure.txt"
+          headers = ["-H", f"Authorization: Bearer {token}", "-H", "Accept: application/vnd.github+json"]
+
+          get = subprocess.run(["curl", "-s", *headers, api], capture_output=True, text=True)
+          sha = None
+          try:
+              j = json.loads(get.stdout)
+              sha = j.get("sha")
+          except Exception:
+              pass
+
+          payload = {
+              "message": f"ci: capture APK-commit failure log (run {run_id}) [skip ci]",
+              "content": b64,
+              "branch": "main",
+          }
+          if sha:
+              payload["sha"] = sha
+
+          put = subprocess.run(
+              ["curl", "-s", "-w", "\\nHTTP:%{http_code}\\n", "-X", "PUT", *headers, api, "-d", json.dumps(payload)],
+              capture_output=True, text=True,
+          )
+          print(put.stdout[-1500:])
+          print(put.stderr[-1500:])
+          PYEOF
