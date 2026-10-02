@@ -85,9 +85,19 @@ jobs:
         # is what this step reports, silently masking a real failure in
         # `flutter build` -- exactly what happened on the previous run,
         # where this step showed "success" with no APK ever produced.
+        #
+        # --split-per-abi: a single universal APK bundles arm64-v8a +
+        # armeabi-v7a + x86_64 native libraries together (this app's ML Kit
+        # on-device OCR pipeline alone contributes ~30MB of native code per
+        # ABI), making the combined file ~90MB -- too large for several
+        # delivery paths (e.g. chat upload limits) and larger than it needs
+        # to be for any single device. Splitting produces one APK per ABI
+        # (~25-30MB each); essentially all real Android phones from the last
+        # several years are arm64-v8a, so that file alone is normally all
+        # that is needed to install on a physical device.
         run: |
           set -o pipefail
-          flutter build apk --release 2>&1 | tee /tmp/build-apk.log
+          flutter build apk --release --split-per-abi 2>&1 | tee /tmp/build-apk.log
 
       - name: Capture build log on failure (for offline diagnosis)
         if: failure()
@@ -141,12 +151,20 @@ jobs:
       - name: Verify APK was actually produced
         working-directory: ./mobile
         run: |
-          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-          if [ ! -f "$APK_PATH" ]; then
-            echo "::error::Release APK was not produced at $APK_PATH"
+          OUT_DIR="build/app/outputs/flutter-apk"
+          MISSING=0
+          for ABI in arm64-v8a armeabi-v7a x86_64; do
+            APK_PATH="$OUT_DIR/app-$ABI-release.apk"
+            if [ ! -f "$APK_PATH" ]; then
+              echo "::error::Release APK was not produced at $APK_PATH"
+              MISSING=1
+            else
+              echo "Verified: $APK_PATH exists ($(du -h "$APK_PATH" | cut -f1))"
+            fi
+          done
+          if [ "$MISSING" != "0" ]; then
             exit 1
           fi
-          echo "Verified: $APK_PATH exists ($(du -h "$APK_PATH" | cut -f1))"
 
       - name: Record APK signer info (for offline verification)
         # Runs regardless of pass/fail so far: this is how the signing setup
@@ -162,10 +180,11 @@ jobs:
           GH_REPO: ${{ github.repository }}
           SIGNED_WITH_PRODUCTION_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
-          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          APK_PATH="build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
           OUT="/tmp/signer-info.txt"
           {
             echo "signed_with_production_key_secret_present=$SIGNED_WITH_PRODUCTION_KEY"
+            echo "checked_apk=$APK_PATH (arm64-v8a split; other ABI splits are signed identically with the same signingConfig)"
             if [ -f "$APK_PATH" ]; then
               CERT_FILE=$(mktemp)
               if unzip -p "$APK_PATH" 'META-INF/*.RSA' > "$CERT_FILE" 2>/dev/null && [ -s "$CERT_FILE" ]; then
@@ -218,11 +237,14 @@ jobs:
           print(put.stderr[-1500:])
           PYEOF
 
-      - name: Upload release APK artifact
+      - name: Upload release APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SetuMitra-Release-APK
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          path: |
+            mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            mobile/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            mobile/build/app/outputs/flutter-apk/app-x86_64-release.apk
 
       - name: Commit release APK into repository (direct-fetch fallback)
         # actions/upload-artifact's download endpoint redirects through Azure
@@ -240,21 +262,26 @@ jobs:
         # `permissions.contents: write`, and layering a second
         # x-access-token@ URL-embedded credential on top of that conflicts
         # with it (this is what made the first attempt at this step fail).
+        # Commits only the arm64-v8a split (what essentially every real
+        # Android phone needs) to keep this repository's size bounded on
+        # every rebuild. The armeabi-v7a and x86_64 splits remain available
+        # via the "Upload release APK artifacts" step above for anyone who
+        # specifically needs them (older 32-bit devices / emulators).
         id: commit_apk
         if: success()
         run: |
           set -o pipefail
           {
             mkdir -p releases
-            cp mobile/build/app/outputs/flutter-apk/app-release.apk releases/SetuMitra-release-latest.apk
+            cp mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk releases/SetuMitra-release-arm64-v8a.apk
             git config user.email "actions@github.com"
             git config user.name "github-actions[bot]"
-            git add releases/SetuMitra-release-latest.apk
+            git add releases/SetuMitra-release-arm64-v8a.apk
             if git diff --cached --quiet; then
               echo "APK content unchanged since last commit -- nothing to do."
               exit 0
             fi
-            git commit -m "release: update SetuMitra-release-latest.apk (run ${{ github.run_id }}) [skip ci]"
+            git commit -m "release: update SetuMitra-release-arm64-v8a.apk (run ${{ github.run_id }}) [skip ci]"
             echo "--- working tree state right after commit ---"
             git status --short
             git diff --stat
@@ -275,7 +302,7 @@ jobs:
               sleep 5
             done
             if [ "$success" != "1" ]; then
-              echo "::error::Failed to push releases/SetuMitra-release-latest.apk after 5 attempts."
+              echo "::error::Failed to push releases/SetuMitra-release-arm64-v8a.apk after 5 attempts."
               exit 1
             fi
           } 2>&1 | tee /tmp/commit-apk.log
