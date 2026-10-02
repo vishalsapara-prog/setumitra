@@ -1,4 +1,5 @@
 signed_with_production_key_secret_present=false
+checked_apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk (arm64-v8a split; other ABI splits are signed identically with the same signingConfig)
 No v1 (JAR) signature block found in the APK -- it may be signed with v2/v3 scheme only. Signer block search result:
        57  1981-01-01 01:01   META-INF/com/android/build/gradle/app-metadata.properties
        46  1981-01-01 01:01   META-INF/version-control-info.textproto
