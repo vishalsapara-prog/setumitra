@@ -1,0 +1,30 @@
+[main 3bed455] release: update SetuMitra-release-latest.apk (run 37050168330) [skip ci]
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 releases/SetuMitra-release-latest.apk
+From https://github.com/vishalsapara-prog/setumitra
+ * branch            main       -> FETCH_HEAD
+   de512b9..88920eb  main       -> origin/main
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+Push attempt 1 failed (likely a race with another commit) -- retrying...
+From https://github.com/vishalsapara-prog/setumitra
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+Push attempt 2 failed (likely a race with another commit) -- retrying...
+From https://github.com/vishalsapara-prog/setumitra
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+Push attempt 3 failed (likely a race with another commit) -- retrying...
+From https://github.com/vishalsapara-prog/setumitra
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+Push attempt 4 failed (likely a race with another commit) -- retrying...
+From https://github.com/vishalsapara-prog/setumitra
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+Push attempt 5 failed (likely a race with another commit) -- retrying...
+::error::Failed to push releases/SetuMitra-release-latest.apk after 5 attempts.
