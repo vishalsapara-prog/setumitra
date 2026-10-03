@@ -1,0 +1,117 @@
+00:00 +0: loading /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart
+00:00 +0: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +1: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +2: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +3: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +4: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +5: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +6: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +7: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend unreachable (network throws) returns a failure response, never a thrown exception
+00:00 +8: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_models_test.dart: AiMappingResponse.fromJsonString (structured JSON output / validation) parses a well-formed response matching the spec-mandated shape exactly
+00:00 +9: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with a non-200 status returns a failure response, never a thrown exception
+00:00 +10: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_models_test.dart: AiMappingResponse.fromJsonString (structured JSON output / validation) rejects non-JSON input safely (never partially trusts it)
+00:00 +11: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with malformed JSON returns a failure response (never a half-trusted mapping)
+00:00 +12: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with malformed JSON returns a failure response (never a half-trusted mapping)
+00:00 +13: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_models_test.dart: AiMappingResponse.fromJsonString (structured JSON output / validation) rejects a response missing the required "mappings" array
+00:00 +14: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with a well-formed mapping succeeds and parses it
+00:00 +15: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with a well-formed mapping succeeds and parses it
+00:00 +16: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) backend responds with a well-formed mapping succeeds and parses it
+00:00 +17: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_models_test.dart: AiMappingResponse.fromJsonString (structured JSON output / validation) rejects a mapping entry missing portal_field
+00:00 +18: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) testConnection() surfaces backend unavailability as AiProviderUnavailableException
+00:00 +19: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- backend-proxy path (scenario #13: backend unavailable) testConnection() surfaces backend unavailability as AiProviderUnavailableException
+00:00 +20: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- direct-to-Gemini path (no backend configured) no API key and no backend configured returns a failure response without any HTTP call
+00:00 +21: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- direct-to-Gemini path (no backend configured) direct Gemini call with a configured API key parses the envelope and extracts the JSON text
+00:00 +22: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- direct-to-Gemini path (no backend configured) direct Gemini call with an unparseable envelope returns a failure response
+00:00 +23: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- direct-to-Gemini path (no backend configured) a non-2xx Gemini response is reported as a failure, never thrown
+00:00 +24: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- sensitive-field guard (defense in depth) refuses to send a sensitive field, failing before any HTTP call is made
+00:00 +25: /home/runner/work/setumitra/setumitra/mobile/test/gemini_ai_provider_test.dart: GeminiProvider.mapFields -- empty request an empty field list succeeds trivially without any HTTP call
+00:00 +26: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies an OTP field as sensitiveNeverProcess
+00:00 +27: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a CAPTCHA field as sensitiveNeverProcess
+00:00 +28: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a password field as sensitiveNeverProcess (by type and by name)
+00:00 +29: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies an email field
+00:00 +30: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a district field
+00:00 +31: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a camelCase compound field name like "StateID" (no delimiter) as state
+00:00 +32: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies an establishment name field
+00:00 +33: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a person name field
+00:00 +33 -1: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a person name field [E]
+  Expected: FieldKind:<FieldKind.properName>
+    Actual: FieldKind:<FieldKind.establishmentName>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/text_normalization_service_test.dart 41:7      main.<fn>.<fn>
+  
+00:00 +33 -1: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a registration/license number field
+00:00 +34 -1: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify defaults to genericText for an unrecognised field
+00:00 +35 -1: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize uppercases and transliterates generic text (English CAPITAL output rule)
+00:00 +36 -1: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize transliterates a Gujarati proper name then uppercases it
+00:00 +36 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize transliterates a Gujarati proper name then uppercases it [E]
+  Expected: 'RAJESHBHAI PATEL'
+    Actual: 'RAJESHABHAI PATEL'
+     Which: is different.
+            Expected: RAJESHBHAI PATEL ...
+              Actual: RAJESHABHAI PATE ...
+                            ^
+             Differ at offset 6
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/text_normalization_service_test.dart 60:7      main.<fn>.<fn>
+  
+00:00 +36 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize preserves email exactly (no uppercase, no transliteration)
+00:00 +37 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize preserves URL exactly
+00:00 +38 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize preserves a registration number's case/format, converting only Gujarati digits
+00:00 +39 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize never processes a sensitive field -- throws rather than silently returning a value
+00:00 +40 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize district normalization defers to GujaratMasterData for a recognised value
+00:00 +41 -2: /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize district normalization falls back to transliteration for an unrecognised value
+00:00 +42 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) resolves અમદાવાદ to the official exonym AHMEDABAD
+00:00 +43 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) resolves બોટાદ to BOTAD
+00:00 +44 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) resolves the state name ગુજરાત to GUJARAT
+00:00 +45 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) recognises an already-English district name case-insensitively
+00:00 +46 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) recognises known English spelling aliases
+00:00 +47 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) returns null for a value that is not Gujarat or one of its districts
+00:00 +48 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarat_master_data_test.dart: GujaratMasterData (Master Data priority) exposes exactly 33 canonical districts
+00:01 +49 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: (setUpAll)
+00:01 +49 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- deterministic + master data (no AI call needed) resolves a field already known to the existing deterministic AutoFill (exact field mapping)
+00:02 +50 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- deterministic + master data (no AI call needed) Master Data priority: district resolves via GujaratMasterData even from Gujarati-script source data
+00:02 +51 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- deterministic + master data (no AI call needed) dropdown matching selects an existing live option value, never free text
+00:02 +52 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- deterministic + master data (no AI call needed) OTP and CAPTCHA fields are entirely excluded -- not mapped, not missing, not sent anywhere
+00:02 +53 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) AI disabled in settings: AI-eligible fields become missing, provider never called
+00:02 +54 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) AI provider unavailable: AI-only fields become missing, deterministic fields are unaffected
+00:02 +55 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) semantic mapping: AI resolves a field the deterministic mapping does not know (synonym understanding)
+00:02 +56 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) low confidence mapping is never eligible for automatic fill, even if the provider claims matched
+00:02 +57 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) AI-proposed dropdown value not matching any real option is downgraded to review required
+00:02 +58 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) missing and conflicting fields reported by the AI are surfaced; unanswered fields are conservatively missing
+00:02 +59 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) provider throwing is not swallowed into a false "success" (defense in depth, never silently trusted)
+00:02 +60 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- AI semantic mapping (fake provider) sensitive fields are never included in the request sent to the AI provider
+00:02 +61 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: AiMappingService -- audit trail recordAudit writes one traceable row per mapping, with the user-confirmation outcome recorded
+00:02 +62 -2: /home/runner/work/setumitra/setumitra/mobile/test/ai_mapping_service_test.dart: (tearDownAll)
+00:02 +62 -2: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates રાજેશભાઈ પટેલ to RAJESHBHAI PATEL (proper-name transliteration)
+00:02 +62 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates રાજેશભાઈ પટેલ to RAJESHBHAI PATEL (proper-name transliteration) [E]
+  Expected: 'RAJESHBHAI PATEL'
+    Actual: 'RAJESHABHAI PATEL'
+     Which: is different.
+            Expected: RAJESHBHAI PATEL ...
+              Actual: RAJESHABHAI PATE ...
+                            ^
+             Differ at offset 6
+  
+  package:matcher                                      expect
+  package:flutter_test/src/widget_tester.dart 473:18   expect
+  test/gujarati_transliteration_service_test.dart 7:7  main.<fn>.<fn>
+  
+00:02 +62 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates ગુજરાત to GUJARAT
+00:02 +63 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates બોટાદ to BOTAD (word-final schwa deletion)
+00:02 +64 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService does NOT reproduce the English exonym for અમદાવાદ (that is master data's job)
+00:02 +65 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService passes through pure English/Latin text unchanged (English -> English)
+00:02 +66 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates only the Gujarati run inside mixed-script text
+00:02 +67 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService converts Gujarati digits to Latin digits
+00:02 +68 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService containsGujarati detects Gujarati-script text
+00:02 +69 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService degrades gracefully (never throws) on an orphan vowel sign with no preceding consonant
+00:02 +70 -3: /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService handles empty input
+00:02 +71 -3: Some tests failed.
+
+Failing tests:
+  /home/runner/work/setumitra/setumitra/mobile/test/gujarati_transliteration_service_test.dart: GujaratiTransliterationService transliterates રાજેશભાઈ પટેલ to RAJESHBHAI PATEL (proper-name transliteration)
+  /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.classify classifies a person name field
+  /home/runner/work/setumitra/setumitra/mobile/test/text_normalization_service_test.dart: TextNormalizationService.normalize transliterates a Gujarati proper name then uppercases it
