@@ -79,6 +79,30 @@ jobs:
         # fail on 10 purely informational issues with no actual errors.
         run: flutter analyze --no-fatal-infos
 
+      - name: Install native SQLite (for sqflite_common_ffi in tests)
+        # The AI AutoFill test suite exercises the real sqflite-backed
+        # DatabaseService/AutoFillMappingService (the existing deterministic
+        # AutoFill path AiMappingService reuses) via sqflite_common_ffi,
+        # which dlopen()s the system libsqlite3 at test time instead of
+        # going through the sqflite Android/iOS platform channel (not
+        # available under plain `flutter test`). ubuntu-latest GitHub-hosted
+        # runners normally already have libsqlite3-0 preinstalled, but this
+        # step makes that an explicit, verified precondition rather than an
+        # assumption -- apt-get install is a no-op (exits 0 instantly) when
+        # the package is already present.
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends libsqlite3-0
+
+      - name: Run tests
+        working-directory: ./mobile
+        # Per the master spec's explicit Phase-1 exit gate: "Tests pass" and
+        # "Flutter test passes" are separate, mandatory conditions -- a
+        # green Gradle build alone is not sufficient, and this step must
+        # genuinely execute (and this workflow must genuinely fail) rather
+        # than being skipped or treated as advisory.
+        run: flutter test
+
       - name: Build release APK
         working-directory: ./mobile
         # explicit pipefail: without it, `tee`'s own exit code (always 0)

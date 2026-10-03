@@ -28,11 +28,18 @@ dependencies:
   google_sign_in: ^7.1.1
   extension_google_sign_in_as_googleapis_auth: ^3.0.0
   googleapis: ^13.2.0
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  # Lets `flutter test` exercise the real sqflite-backed DatabaseService /
+  # AutoFillMappingService (AiMappingService's existing-deterministic-
+  # mapping path) via an FFI-backed SQLite instead of the plugin platform
+  # channel, which plain `flutter test` does not provide. Test-only; never
+  # shipped in the release APK (dev_dependencies are excluded from builds).
+  sqflite_common_ffi: ^2.3.3
 
 flutter:
   uses-material-design: true

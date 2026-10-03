@@ -6,6 +6,7 @@ import 'camera_settings_screen.dart';
 import 'advanced_ocr_settings_screen.dart';
 import 'audit_trail_screen.dart';
 import 'auto_fill_mapping_screen.dart';
+import 'ai_autofill_settings_screen.dart';
 import 'contacts_export_screen.dart';
 import 'google_drive_backup_screen.dart';
 
@@ -90,6 +91,14 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: const Text('Version, import, test, rollback', style: TextStyle(fontSize: 11.5)),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AutoFillMappingScreen())),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.smart_toy_outlined, color: Color(0xFF2B6CB0)),
+                  title: const Text('AI AutoFill'),
+                  subtitle: const Text('AI-assisted field mapping, provider, confidence', style: TextStyle(fontSize: 11.5)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AiAutoFillSettingsScreen())),
                 ),
                 const Divider(height: 1),
                 ListTile(
