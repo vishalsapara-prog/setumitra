@@ -38,7 +38,16 @@ void main() {
     });
 
     test('classifies a person name field', () {
-      expect(TextNormalizationService.classify(name: 'PrincipalEmployerName'), FieldKind.properName);
+      // Deliberately NOT 'PrincipalEmployerName' here: a "Principal
+      // Employer" is itself a business/establishment entity on this
+      // portal (the counterpart of "Contractor"), so that field name
+      // correctly classifies as FieldKind.establishmentName, not
+      // properName -- classify() checks establishment keywords (which
+      // include "employer") before person-name keywords precisely so a
+      // field like that is not misclassified as a person's name.
+      // 'AuthorizedPersonName' is unambiguously a natural person's name
+      // (spec Section D, "Authorized Person").
+      expect(TextNormalizationService.classify(name: 'AuthorizedPersonName'), FieldKind.properName);
     });
 
     test('classifies a registration/license number field', () {

@@ -34,7 +34,20 @@
 ///         conjunct; the next consonant is processed independently);
 ///      c) it is the LAST Gujarati letter of its word AND has no matra --
 ///         then its inherent "a" is deleted ("word-final schwa deletion"),
-///         e.g. "બોટાદ" ends in bare "D", not "DA".
+///         e.g. "બોટાદ" ends in bare "D", not "DA";
+///      d) it is immediately followed by the honorific name-suffix "ભાઈ"
+///         ("bhai") or "બેન" ("ben") running to the end of the word -- Gujarati
+///         compound personal names built as <name>+bhai/ben (overwhelmingly
+///         common on these government forms, e.g. "રાજેશભાઈ" = "રાજેશ" (Rajesh)
+///         + "ભાઈ" (bhai)) drop the preceding syllable's schwa the same way
+///         true word-final position does, e.g. "રાજેશભાઈ" -> "RAJESHBHAI", not
+///         the character-by-character "RAJESHABHAI". This is a narrow,
+///         explicitly-named special case for two specific, extremely common
+///         suffixes -- NOT a general mid-word schwa-deletion algorithm (full
+///         Hindi/Gujarati schwa deletion is a genuinely hard, dictionary- or
+///         statistics-dependent NLP problem well outside what a pure
+///         character-level table can resolve, and this service does not
+///         pretend otherwise for any other consonant cluster).
 ///   2. Vowel signs (matras) and independent vowels are collapsed to a
 ///      single Latin letter each (long/short distinctions merge: ા/આ and
 ///      િ/ી and ુ/ૂ each map to one Latin vowel) -- this is what makes
@@ -176,6 +189,26 @@ class GujaratiTransliterationService {
     0x0AAE, // મ M
   };
 
+  /// "ભાઈ" (bhai) and "બેન" (ben) -- see algorithm note 1(d) above. Each
+  /// pattern must match the Gujarati run EXACTLY from the match start to
+  /// the run's end (never mid-word), since these are name-final honorific
+  /// suffixes, not independently-meaningful syllables elsewhere.
+  static const List<int> _honorificSuffixBhai = [0x0AAD, 0x0ABE, 0x0A88]; // ભ ા ઈ
+  static const List<int> _honorificSuffixBen = [0x0AAC, 0x0AC7, 0x0AA8]; // બ ે ન
+
+  static bool _isHonorificSuffixAt(List<int> run, int start) {
+    return _matchesExactToEnd(run, start, _honorificSuffixBhai) ||
+        _matchesExactToEnd(run, start, _honorificSuffixBen);
+  }
+
+  static bool _matchesExactToEnd(List<int> run, int start, List<int> pattern) {
+    if (run.length - start != pattern.length) return false;
+    for (int k = 0; k < pattern.length; k++) {
+      if (run[start + k] != pattern[k]) return false;
+    }
+    return true;
+  }
+
   static const Map<int, String> _digits = {
     0x0AE6: '0',
     0x0AE7: '1',
@@ -269,9 +302,12 @@ class GujaratiTransliterationService {
           continue;
         }
         // No matra, no virama immediately after: inherent schwa "A",
-        // unless this consonant is the last Gujarati letter in the word.
+        // unless this consonant is the last Gujarati letter in the word,
+        // or the rest of the word is the honorific suffix "ભાઈ"/"બેન"
+        // (algorithm note 1(d) above), which absorbs it the same way.
         buf.write(base);
-        if (hasNext) {
+        final suppressSchwaForHonorificSuffix = hasNext && _isHonorificSuffixAt(run, i + 1);
+        if (hasNext && !suppressSchwaForHonorificSuffix) {
           buf.write('A');
         }
         i += 1;
