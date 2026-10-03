@@ -12,3 +12,15 @@ key.properties
 app/*.jks
 app/*.keystore
 app/*.p12
+
+# Exception: app/shared-debug.keystore is NOT production signing material --
+# it is a plain, non-secret, self-signed DEBUG-only key (see build.gradle's
+# signingConfigs.debug), committed deliberately so every build (local or CI)
+# signs with the SAME debug key. Without this, CI's ephemeral runners would
+# each have Android Gradle Plugin auto-generate a brand-new, random debug
+# keystore on every run, making consecutive CI-built APKs mutually
+# upgrade-INCOMPATIBLE whenever no production key is configured (confirmed:
+# two consecutive runs produced different SHA-256 signer fingerprints before
+# this file existed). Its password ("android") and alias ("androiddebugkey")
+# are the well-known, non-secret Android debug-keystore conventions.
+!app/shared-debug.keystore

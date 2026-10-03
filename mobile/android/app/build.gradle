@@ -94,6 +94,28 @@ android {
                 storeType keystoreProperties.getProperty("storeType", "PKCS12")
             }
         }
+
+        // Overrides the Android Gradle Plugin's IMPLICIT default debug
+        // signing config (which auto-generates a brand-new, randomly-keyed
+        // debug.keystore under $HOME/.android/ the first time it's needed on
+        // whatever machine runs the build). On GitHub Actions' ephemeral
+        // runners that file never pre-exists, so every CI run with no
+        // production key configured used to get a DIFFERENT random debug
+        // key -- confirmed by directly comparing two consecutive CI builds'
+        // actual v2 signing certificates, which had completely different
+        // SHA-256 fingerprints despite both being plain "Android Debug"
+        // certs. That made every such APK upgrade-INCOMPATIBLE with the one
+        // before it. app/shared-debug.keystore (committed; see android/
+        // .gitignore's explicit exception and comment -- it is a non-secret
+        // debug-only key, never used for any real release) makes this
+        // signing identity stable across every build, local or CI, so
+        // consecutive debug-signed APKs install as upgrades of each other.
+        debug {
+            storeFile file("shared-debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
     }
 
     buildTypes {
