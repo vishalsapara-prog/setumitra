@@ -101,7 +101,64 @@ jobs:
         # green Gradle build alone is not sufficient, and this step must
         # genuinely execute (and this workflow must genuinely fail) rather
         # than being skipped or treated as advisory.
-        run: flutter test
+        #
+        # --reporter expanded + tee: the plain default reporter truncates
+        # passing-test noise but still needs to be captured somewhere this
+        # offline-diagnosis environment can actually read -- its only path
+        # back here is committing it to the repo (see the next step),
+        # exactly like the existing release-build log capture below.
+        run: |
+          set -o pipefail
+          flutter test --reporter expanded 2>&1 | tee /tmp/test-output.log
+
+      - name: Capture test log on failure (for offline diagnosis)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PYEOF'
+          import base64, json, os, subprocess
+
+          log_path = "/tmp/test-output.log"
+          try:
+              with open(log_path, "rb") as f:
+                  data = f.read()
+          except FileNotFoundError:
+              data = b"(no log captured -- test step produced no /tmp/test-output.log)"
+
+          tail = data[-120000:]
+          b64 = base64.b64encode(tail).decode()
+          repo = os.environ["GH_REPO"]
+          token = os.environ["GH_TOKEN"]
+          run_id = os.environ["RUN_ID"]
+          api = f"https://api.github.com/repos/{repo}/contents/ci-logs/last-test-failure.txt"
+          headers = ["-H", f"Authorization: Bearer {token}", "-H", "Accept: application/vnd.github+json"]
+
+          get = subprocess.run(["curl", "-s", *headers, api], capture_output=True, text=True)
+          sha = None
+          try:
+              j = json.loads(get.stdout)
+              sha = j.get("sha")
+          except Exception:
+              pass
+
+          payload = {
+              "message": f"ci: capture test failure log (run {run_id}) [skip ci]",
+              "content": b64,
+              "branch": "main",
+          }
+          if sha:
+              payload["sha"] = sha
+
+          put = subprocess.run(
+              ["curl", "-s", "-w", "\\nHTTP:%{http_code}\\n", "-X", "PUT", *headers, api, "-d", json.dumps(payload)],
+              capture_output=True, text=True,
+          )
+          print(put.stdout[-1500:])
+          print(put.stderr[-1500:])
+          PYEOF
 
       - name: Build release APK
         working-directory: ./mobile
